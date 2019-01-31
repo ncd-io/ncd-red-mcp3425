@@ -14,14 +14,14 @@ var comm = new comms.NcdSerialI2C(serial, 0);
 //var comm = new comms.NcdI2C(1);
 
 var config = {
-	range: 15,
-	sType: "d",
-	tempScale: "f"
+	resolution: 16,
+	gain: 1,
+	mode: 1 // continuous conversion
 };
-var dac = new MCP3425(comm, config);
+var adc = new MCP3425(comm, config);
 
 function testGet(){
-	dac.get().then((r) => {
+	adc.get().then((r) => {
 		console.log(r);
 		setTimeout(testGet, 1000);
 	}).catch(console.log);
