@@ -13,7 +13,8 @@
     "keywords": [
         "MCP3425",
         "ncd",
-        "i2c"
+        "i2c",
+		"ADC"
     ],
     "author": "Trey Felton",
     "license": "MIT",
@@ -23,11 +24,11 @@
         }
     },
     "dependencies": {
-        "ncd-red-comm": "^1.5.1",
+        "ncd-red-comm": "^1.6.3",
         "promise-queue": "^2.2.5"
     },
-	"bugs": {
-	    "url": "https://github.com/ncd-io/ncd-red-mcp3425/issues"
-	},
-	"homepage": "https://github.com/ncd-io/ncd-red-mcp3425#readme"
+    "bugs": {
+        "url": "https://github.com/ncd-io/ncd-red-mcp3425/issues"
+    },
+    "homepage": "https://github.com/ncd-io/ncd-red-mcp3425#readme"
 }

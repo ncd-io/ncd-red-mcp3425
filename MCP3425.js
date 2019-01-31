@@ -11,7 +11,7 @@ module.exports = function(RED){
 		RED.nodes.createNode(this, config);
 
 		//set the address from config
-		this.addr = parseInt(config.addr);
+		this.addr = 0x68;
 
 		//set the interval to poll from config
 		this.interval = parseInt(config.interval);
@@ -45,17 +45,18 @@ module.exports = function(RED){
 			return true;
 		}
 
+		var incoming;
+
 		//send telemetry data out the nodes output
 		function send_payload(_status){
-			var msg = [
-				{topic: 'pressure', payload: _status.pressure},
-				{topic: 'temperature', payload: _status.temperature},
-			];
+			var msg = incoming ? incoming : {};
+			msg.payload = _status * config.mult;
+			incoming = false;
 			node.send(msg);
 		}
 
 		//get the current telemetry data
-		(get_status=function(repeat, force){
+		function get_status(repeat, force){
 			if(repeat) clearTimeout(sensor_pool[node.id].timeout);
 			if(device_status(node)){
 				node.sensor.get().then(send_payload).catch((err) => {
@@ -76,13 +77,13 @@ module.exports = function(RED){
 					if(typeof sensor_pool[node.id] != 'undefined') get_status(true);
 				}, 3000);
 			}
-		})(node.interval && !sensor_pool[node.id].polling);
+		}
+		get_status(node.interval && !sensor_pool[node.id].polling);
 
 		//if status is requested, fetch it
 		node.on('input', (msg) => {
-			if(msg.topic == 'get_status'){
-				get_status(false);
-			}
+			incoming = msg;
+			get_status(false);
 		});
 
 		//if node is removed, kill the sensor object

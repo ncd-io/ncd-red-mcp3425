@@ -5,10 +5,9 @@ module.exports = class MCP3425{
 
 		//extend with default values
 		this.config = Object.assign({
-			range: 0,
-			sType: "d",
-			tempScale: "c",
-			pScale: "mbar"
+			resolution: 12,
+			gain: 1,
+			mode: 1
 		}, config);
 
 		//set default states and initialize
@@ -19,55 +18,50 @@ module.exports = class MCP3425{
 		this.raw = [];
 		this.init();
 	}
+	configByte(){
+		var gain = {"1": 0, "2": 1, "4": 2, "8": 3};
+		return 128 | ((this.config.resolution - 12) / 2) * 4 | gain[this.config.gain] | (this.config.mode << 4);
+	}
 	init(){
 		//Run initialization routine for the chip
-		this.get().then().catch((err) => {
+		console.log("config byte", this.configByte());
+		this.comm.writeBytes(this.addr, this.configByte()).then(() => {
+			this.initialized = true;
+		}).catch((err) => {
+			this.initialized = false;
 			console.log(err);
 		});
 	}
-	parseStatus(status){
-		//parse the retrieved values into real world values
-		var range = this.config.range;
-		var min = 0,
-			max;
-
-		switch(this.config.range){
-			case 0:
-				max = .075;
-				break;
-			case 1:
-				max = .15;
-				break;
-			default:
-				max = this.config.range/10;
-				break;
-		}
-
-		if(this.config.sType.toLowerCase() == "d-b") min -= max;
-		else if(this.config.sType.toLowerCase() == "b") min = 11;
-
-		var pCounts = ((status[0] & 127) << 8) | status[1];
-		var tCounts = ((status[2] & 127) << 8) | status[3];
-		//mbar
-		this.status.pressure = ((pCounts - 3277) / (26214 / (max-min)) + min) * this.config.pScale;
-		//celsius
-		this.status.temperature = ((tCounts - 3277) / (26214 / 110) + (-25));
-
-		if(this.config.tempScale.toLowerCase() == "f") this.status.temperature = this.status.temperature * 1.8 + 32;
-		else if(this.config.tempScale.toLowerCase() == "k") this.status.temperature += 273.15;
-
-		return this.status;
-	}
-	get(){
-		//Fetch the telemetry values from the chip
-		return new Promise((fulfill, reject) => {
-			this.comm.readBytes(this.addr, 4).then((r) => {
-				this.initialized = true;
-				fulfill(this.parseStatus(r));
-			}).catch((err) => {
-				this.initialized = false;
-				reject(err);
+	get(read, tries=0){
+		if(this.config.mode == 0 && read !== true){
+			return new Promise((fulfill, reject) => {
+				this.comm.writeBytes(this.addr, this.configByte()).then(() => {
+					this.initialized = true;
+					this.get(true).then(fulfill).catch(reject);
+				}).catch((err) => {
+					this.initialized = false;
+					console.log(err);
+				});
 			});
-		});
+		}else{
+			//Fetch the telemetry values from the chip
+			return new Promise((fulfill, reject) => {
+				this.comm.readBytes(this.addr, 3).then((r) => {
+					this.initialized = true;
+					if((r[2] & 128) == 0){
+						fulfill((r[0] << 8) | r[1]);
+					}else{
+						if(tries > 5){
+							reject('Timeout, no new data');
+						}else{
+							this.get(true, tries++).then(fulfill).catch(reject);
+						}
+					}
+				}).catch((err) => {
+					this.initialized = false;
+					reject(err);
+				});
+			});
+		}
 	}
 };
