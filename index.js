@@ -24,7 +24,6 @@ module.exports = class MCP3425{
 	}
 	init(){
 		//Run initialization routine for the chip
-		console.log("config byte", this.configByte());
 		this.comm.writeBytes(this.addr, this.configByte()).then(() => {
 			this.initialized = true;
 		}).catch((err) => {
@@ -49,7 +48,10 @@ module.exports = class MCP3425{
 				this.comm.readBytes(this.addr, 3).then((r) => {
 					this.initialized = true;
 					if((r[2] & 128) == 0){
-						fulfill((r[0] << 8) | r[1]);
+						var reading = (r[0] << 8) | r[1];
+						reading &= (1 << this.config.resolution) - 1;
+						var status = signInt(reading, this.config.resolution);
+						fulfill(status);
 					}else{
 						if(tries > 5){
 							reject('Timeout, no new data');
@@ -65,3 +67,7 @@ module.exports = class MCP3425{
 		}
 	}
 };
+function signInt(i, b){
+	if(i.toString(2).length != b) return i;
+	return -(((~i) & ((1 << (b-1))-1))+1);
+}
