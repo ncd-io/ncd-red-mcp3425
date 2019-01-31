@@ -1,0 +1,33 @@
+{
+    "name": "ncd-red-mcp3425",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"The test.js file may be used for testing, but configuration of the I2C connection is required.\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/ncd-io/ncd-red-mcp3425"
+    },
+    "keywords": [
+        "MCP3425",
+        "ncd",
+        "i2c"
+    ],
+    "author": "Trey Felton",
+    "license": "MIT",
+    "node-red": {
+        "nodes": {
+            "ncd-lower_chip": "MCP3425.js"
+        }
+    },
+    "dependencies": {
+        "ncd-red-comm": "^1.5.1",
+        "promise-queue": "^2.2.5"
+    },
+	"bugs": {
+	    "url": "https://github.com/ncd-io/ncd-red-mcp3425/issues"
+	},
+	"homepage": "https://github.com/ncd-io/ncd-red-mcp3425#readme"
+}
