@@ -1,4 +1,3 @@
-###This text and image should be replaced:
 This library provides a class for the MCP3425, it relies on the ncd-red-comm library for communication, and includes a node-red node for MCP3425. The MCP3425 is a 1-Channel Analog to Digital Converter with 16-Bit resolution, ideally suited for low-speed high-resolution sensor monitoring. [Ncd.io](https://ncd.io) manufactures a mini-module that utilizes this converter in an easy to use form factor. You can view and purchase the mini-module [here](https://store.ncd.io/product/mcp3425-16-bit-1-channel-analog-to-digital-converter-i2c-mini-module).
 
 [![MCP3425](./MCP3425.png)](https://store.ncd.io/product/mcp3425-16-bit-1-channel-analog-to-digital-converter-i2c-mini-module)
