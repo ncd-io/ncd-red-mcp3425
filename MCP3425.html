@@ -10,9 +10,8 @@
 			gain: {value: 1, validate: RED.validators.number()},
 			mode: {value: 1, validate: RED.validators.number()},
 			mult: {value: 1, validate: function(v){
-					var int = parseInt(v, base);
-					return int >= l && int <= h;
-				}}
+					return parseFloat(v);
+				}
         },
         inputs:1,
         outputs:1,
