@@ -9,9 +9,7 @@
 			resolution: {value: 12, validate: RED.validators.number()},
 			gain: {value: 1, validate: RED.validators.number()},
 			mode: {value: 1, validate: RED.validators.number()},
-			mult: {value: 1, validate: function(v){
-					return parseFloat(v);
-				}
+			mult: {value: 1, validate: v => parseFloat(v)}
         },
         inputs:1,
         outputs:1,
